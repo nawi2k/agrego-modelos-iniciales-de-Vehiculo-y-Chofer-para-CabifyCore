@@ -5,31 +5,33 @@ public class Viaje {
     private Chofer choferAsignado;
     private double tarifaTotal;
 
-    private static final double TARIFA_BASE = 500.0; 
-    private static final double COSTO_POR_KM = 350.0; 
+    private static final double TARIFA_BASE = 500.0;
+    private static final double COSTO_POR_KM = 350.0;
 
 
-    public Viaje(String origen, String destino, double distanciaKm, Chofer choferAsignado) {
+    public Viaje(String origen, String destino, double distanciaKm, Chofer choferAsignado) throws SinChoferDisponibleException {
+        
+        if (!choferAsignado.isDisponible()) {
+            throw new SinChoferDisponibleException("⚠️ ERROR: El chofer " + choferAsignado.getNombre() + " ya se encuentra ocupado en otro viaje.");
+        }
+
         this.origen = origen;
         this.destino = destino;
         this.distanciaKm = distanciaKm;
         this.choferAsignado = choferAsignado;
         
-
         this.tarifaTotal = calcularTarifa();
-        this.choferAsignado.ocupar(); 
+        this.choferAsignado.ocupar(); // Ocupamos al chofer
     }
 
     private double calcularTarifa() {
         return TARIFA_BASE + (distanciaKm * COSTO_POR_KM);
     }
 
-
     public void finalizarViaje() {
-        this.choferAsignado.liberar(); 
+        this.choferAsignado.liberar();
         System.out.println("✅ Viaje finalizado con éxito. El chofer " + choferAsignado.getNombre() + " ya está libre.");
     }
-
 
     public double getTarifaTotal() {
         return tarifaTotal;
@@ -39,7 +41,6 @@ public class Viaje {
         return choferAsignado;
     }
 
-    // REPORTE DEL VIAJE
     public String obtenerResumenViaje() {
         return "--- COMPROBANTE DE VIAJE ---\n" +
                "Origen: " + origen + "\n" +
